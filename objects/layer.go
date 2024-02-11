@@ -19,7 +19,7 @@ func NewLayer(x float64, y float64, scale float64, container services.ServiceCon
 		if rand.Int31n(2) == 1 {
 			letters[i] = NewEmptySpace()
 		} else {
-			randomShiftY := rand.Int31n(static.ScreenHeight / 3)
+			randomShiftY := rand.Int31n(static.ResolutionHeight / 3)
 			letters[i] = NewLetterAtScale(x+float64((static.IconWidth-static.IconOverlap)*i), y+float64(i)+float64(randomShiftY), scale, container)
 		}
 	}

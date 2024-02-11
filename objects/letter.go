@@ -40,7 +40,7 @@ func NewLetterAtScale(x float64, y float64, scale float64, container services.Se
 
 func (l *letter) Update() error {
 	change := static.NormalSpeed(1)
-	hitBottom := l.y+change-float64(static.IconHeight*len(l.trail)) > static.ScreenHeight
+	hitBottom := l.y+change-float64(static.IconHeight*len(l.trail)) > static.ResolutionHeight
 
 	if hitBottom {
 		l.y = 0

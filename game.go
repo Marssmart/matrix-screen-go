@@ -14,14 +14,14 @@ type Game struct {
 func NewGame() *Game {
 	container := services.NewServiceContainer()
 
-	layers := make([]objects.Layer, 1)
+	layers := make([]objects.Layer, 6)
 
-	layers[0] = objects.NewLayer(5, 0, 0.4, container)
-	/*layers[1] = objects.NewLayer(1, 0, 0.6, container)
-	layers[2] = objects.NewLayer(3, 0, 0.8, container)
-	layers[3] = objects.NewLayer(0, 0, 1, container)
-	layers[4] = objects.NewLayer(0, static.ScreenHeight/2, 1, container)
-	layers[5] = objects.NewLayer(0, static.ScreenHeight/3, 1, container)*/
+	layers[0] = objects.NewLayer(5, 0, 0.1, container)
+	layers[1] = objects.NewLayer(1, 0, 0.2, container)
+	layers[2] = objects.NewLayer(3, 0, 0.3, container)
+	layers[3] = objects.NewLayer(0, 0, 0.5, container)
+	layers[4] = objects.NewLayer(0, static.ResolutionHeight/2, 0.7, container)
+	layers[5] = objects.NewLayer(0, static.ResolutionHeight/3, 0.7, container)
 
 	return &Game{layers}
 }
@@ -43,5 +43,5 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(int, int) (screenWidth int, screenHeight int) {
-	return static.ScreenWidth, static.ScreenHeight
+	return static.ResolutionWidth, static.ResolutionHeight
 }
