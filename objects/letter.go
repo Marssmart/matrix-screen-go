@@ -2,7 +2,6 @@ package objects
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"math/rand"
 	"matrix-screen-go/services"
 	"matrix-screen-go/static"
 )
@@ -27,13 +26,12 @@ type letter struct {
 type trail struct {
 	image   *ebiten.Image
 	options *ebiten.DrawImageOptions
+	x       float64
+	y       float64
 }
 
 func NewLetterAtScale(x float64, y float64, scale float64, speed float64, container services.ServiceContainer) Letter {
-	trails := make([]*trail, rand.Int31n(static.MaxTrailLength)+static.MinTrailLength)
-	for i := 0; i < len(trails); i++ {
-		trails[i] = &trail{container.ImageService().PickRandom(), &ebiten.DrawImageOptions{}}
-	}
+	trails := make([]*trail, 0)
 	return &letter{
 		x, y, nil, trails, 0, scale, speed, &ebiten.DrawImageOptions{}, container,
 	}
@@ -41,7 +39,7 @@ func NewLetterAtScale(x float64, y float64, scale float64, speed float64, contai
 
 func (l *letter) Update() error {
 	change := static.SpeedToMovement(1, l.speed)
-	hitBottom := l.y+change-float64(static.IconHeight*len(l.trail)) > static.ResolutionHeight
+	hitBottom := l.y+change > static.ResolutionHeight
 
 	if hitBottom {
 		l.y = 0
@@ -53,20 +51,26 @@ func (l *letter) Update() error {
 }
 
 func (l *letter) Draw(screen *ebiten.Image) {
+
+	//draw the trail
+	for _, memory := range l.trail {
+		memory.options = resetScaleAndTranslate(memory.options, l.scale, memory.x, memory.y)
+		l.container.ImageService().Draw(screen, memory.image, memory.options)
+	}
+
 	//draw the lead
 	l.options = resetScaleAndTranslate(l.options, l.scale, l.x, l.y)
 	if l.lastUsed == 0 || l.lastUsed == 25 {
 		l.last = l.container.ImageService().DrawRandom(screen, l.options)
+		l.trail = append([]*trail{{l.last, &ebiten.DrawImageOptions{}, l.x, l.y}}, l.trail...)
 		l.lastUsed = 1
 	} else {
 		l.container.ImageService().Draw(screen, l.last, l.options)
 		l.lastUsed = l.lastUsed + 1
 	}
 
-	//draw the trail
-	for idx, memory := range l.trail {
-		memory.options = resetScaleAndTranslate(memory.options, l.scale, l.x, l.y-float64((idx+1)*(static.IconHeight-static.IconOverlap)))
-		l.container.ImageService().Draw(screen, memory.image, memory.options)
+	if len(l.trail) > static.MaxTrailLength {
+		l.trail = l.trail[:len(l.trail)-1]
 	}
 }
 
