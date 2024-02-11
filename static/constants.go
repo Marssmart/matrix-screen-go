@@ -5,7 +5,7 @@ const (
 	ScreenWidth    = 1024
 	IconHeight     = 100
 	IconWidth      = 100
-	IconOverlap    = 15
+	IconOverlap    = IconHeight / 2
 	LetterAlpha    = "assets/100x100/alpha.png"
 	LetterBeta     = "assets/100x100/beta.png"
 	LetterGamma    = "assets/100x100/gamma.png"

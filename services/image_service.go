@@ -37,15 +37,27 @@ func NewImageService() ImageService {
 }
 
 type ImageService interface {
-	DrawRandom(screen *ebiten.Image, options *ebiten.DrawImageOptions)
+	PickRandom() *ebiten.Image
+	DrawRandom(screen *ebiten.Image, options *ebiten.DrawImageOptions) *ebiten.Image
+	Draw(screen *ebiten.Image, image *ebiten.Image, options *ebiten.DrawImageOptions)
 }
 
 type imageService struct {
 	images []*ebiten.Image
 }
 
-func (i *imageService) DrawRandom(screen *ebiten.Image, options *ebiten.DrawImageOptions) {
-	screen.DrawImage(i.images[rand.Int31n(int32(len(i.images)))], options)
+func (i *imageService) PickRandom() *ebiten.Image {
+	return i.images[rand.Int31n(int32(len(i.images)))]
+}
+
+func (i *imageService) DrawRandom(screen *ebiten.Image, options *ebiten.DrawImageOptions) *ebiten.Image {
+	image := i.PickRandom()
+	screen.DrawImage(image, options)
+	return image
+}
+
+func (i *imageService) Draw(screen *ebiten.Image, image *ebiten.Image, options *ebiten.DrawImageOptions) {
+	screen.DrawImage(image, options)
 }
 
 func loadImage(path string) *ebiten.Image {
