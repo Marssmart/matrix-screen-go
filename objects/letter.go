@@ -64,7 +64,7 @@ func (l *letter) Draw(screen *ebiten.Image) {
 	}
 
 	//draw the trail
-	for idx, memory := range l.trail[1:] {
+	for idx, memory := range l.trail {
 		memory.options = resetScaleAndTranslate(memory.options, l.scale, l.x, l.y-float64((idx+1)*(static.IconHeight-static.IconOverlap)))
 		l.container.ImageService().Draw(screen, memory.image, memory.options)
 	}
