@@ -7,7 +7,9 @@ const (
 	ResolutionWidth  = ScreenWidth * 4
 	IconHeight       = 100
 	IconWidth        = 100
-	IconOverlap      = IconHeight / 2
+	MaxTrailLength   = 35
+	MinTrailLength   = 7
+	IconOverlap      = IconHeight / 5
 	LetterAlpha      = "assets/100x100/alpha.png"
 	LetterBeta       = "assets/100x100/beta.png"
 	LetterGamma      = "assets/100x100/gamma.png"

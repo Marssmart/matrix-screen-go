@@ -19,6 +19,7 @@ type letter struct {
 	trail     []*trail
 	lastUsed  int
 	scale     float64
+	speed     float64
 	options   *ebiten.DrawImageOptions
 	container services.ServiceContainer
 }
@@ -28,18 +29,18 @@ type trail struct {
 	options *ebiten.DrawImageOptions
 }
 
-func NewLetterAtScale(x float64, y float64, scale float64, container services.ServiceContainer) Letter {
-	trails := make([]*trail, rand.Int31n(5)+5)
+func NewLetterAtScale(x float64, y float64, scale float64, speed float64, container services.ServiceContainer) Letter {
+	trails := make([]*trail, rand.Int31n(static.MaxTrailLength)+static.MinTrailLength)
 	for i := 0; i < len(trails); i++ {
 		trails[i] = &trail{container.ImageService().PickRandom(), &ebiten.DrawImageOptions{}}
 	}
 	return &letter{
-		x, y, nil, trails, 0, scale, &ebiten.DrawImageOptions{}, container,
+		x, y, nil, trails, 0, scale, speed, &ebiten.DrawImageOptions{}, container,
 	}
 }
 
 func (l *letter) Update() error {
-	change := static.NormalSpeed(1)
+	change := static.SpeedToMovement(1, l.speed)
 	hitBottom := l.y+change-float64(static.IconHeight*len(l.trail)) > static.ResolutionHeight
 
 	if hitBottom {
@@ -64,7 +65,7 @@ func (l *letter) Draw(screen *ebiten.Image) {
 
 	//draw the trail
 	for idx, memory := range l.trail[1:] {
-		memory.options = resetScaleAndTranslate(memory.options, l.scale, l.x, l.y-float64((idx+1)*static.IconHeight))
+		memory.options = resetScaleAndTranslate(memory.options, l.scale, l.x, l.y-float64((idx+1)*(static.IconHeight-static.IconOverlap)))
 		l.container.ImageService().Draw(screen, memory.image, memory.options)
 	}
 }
