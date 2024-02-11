@@ -19,3 +19,8 @@
 
 # Go workspace file
 go.work
+matrix-screen-go
+
+#IDE
+*.iml
+.idea
