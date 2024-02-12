@@ -43,20 +43,24 @@ func NewImageService() ImageService {
 	}
 
 	cache := make(map[assetKey]*ebiten.Image)
+	leadLetterImageCache := make(map[assetKey]*ebiten.Image)
 	for _, l := range letters {
 		opacity100 := toAssetKey(l, static.LetterAssetFolder)
 		opacity80 := toAssetKey(l, static.LetterAssetOpacity80Folder)
 		opacity60 := toAssetKey(l, static.LetterAssetOpacity60Folder)
 		opacity40 := toAssetKey(l, static.LetterAssetOpacity40Folder)
 		opacity20 := toAssetKey(l, static.LetterAssetOpacity20Folder)
-		cache[opacity100] = loadImage(opacity100)
+		noOpacityImage := loadImage(opacity100)
+		cache[opacity100] = noOpacityImage
+		leadLetterImageCache[opacity100] = noOpacityImage
 		cache[opacity80] = loadImage(opacity80)
 		cache[opacity60] = loadImage(opacity60)
 		cache[opacity40] = loadImage(opacity40)
 		cache[opacity20] = loadImage(opacity20)
+
 	}
 
-	return &imageService{imageCache: cache}
+	return &imageService{imageCache: cache, leadLetterImageCache: leadLetterImageCache}
 }
 
 type ImageService interface {
@@ -68,7 +72,8 @@ type ImageService interface {
 }
 
 type imageService struct {
-	imageCache map[assetKey]*ebiten.Image
+	imageCache           map[assetKey]*ebiten.Image
+	leadLetterImageCache map[assetKey]*ebiten.Image
 }
 
 type assetKey struct {
@@ -85,11 +90,11 @@ func toAssetKey(key string, folder string) assetKey {
 }
 
 func (i *imageService) PickRandom() (string, *ebiten.Image) {
-	index := rand.Int31n(int32(len(i.imageCache)))
+	index := rand.Int31n(int32(len(i.leadLetterImageCache)))
 	var idx int32 = 0
-	for k := range i.imageCache {
+	for k := range i.leadLetterImageCache {
 		if idx == index {
-			return k.key, i.imageCache[k]
+			return k.key, i.leadLetterImageCache[k]
 		}
 		idx++
 	}
