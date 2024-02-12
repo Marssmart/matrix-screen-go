@@ -2,6 +2,7 @@ package objects
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"math/rand"
 	"matrix-screen-go/services"
 	"matrix-screen-go/static"
 )
@@ -44,7 +45,7 @@ func NewLetterAtScale(x float64, y float64, scale float64, speed float64, contai
 }
 
 func (l *letter) Update() error {
-	change := static.SpeedToMovement(1, l.speed)
+	change := static.SpeedToMovement(1, l.speed) * (1 + rand.Float64())
 	hitBottom := l.y+change > static.ResolutionHeight
 
 	if hitBottom {
