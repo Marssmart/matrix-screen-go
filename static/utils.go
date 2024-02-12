@@ -5,5 +5,5 @@ func SpeedToMovement(increment float64, speed float64) float64 {
 }
 
 func LetterCount(offset float64, scale float64) int {
-	return int((ResolutionWidth - offset) / ((IconWidth - IconOverlap) * scale))
+	return int((ResolutionWidth - offset) / ((IconWidth - IconOverlapInRow) * scale))
 }

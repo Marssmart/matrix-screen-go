@@ -13,17 +13,18 @@ type Letter interface {
 }
 
 type letter struct {
-	x          float64
-	y          float64
-	last       *imageRef
-	trail      []*trail
-	lastUsed   int
-	scale      float64
-	step       float64
-	stampLimit int
-	opacity    services.Opacity
-	options    *ebiten.DrawImageOptions
-	container  services.ServiceContainer
+	x              float64
+	y              float64
+	last           *imageRef
+	trailDropLimit int
+	trail          []*trail
+	lastUsed       int
+	scale          float64
+	step           float64
+	stampLimit     int
+	opacity        services.Opacity
+	options        *ebiten.DrawImageOptions
+	container      services.ServiceContainer
 }
 
 type trail struct {
@@ -42,10 +43,10 @@ type imageRef struct {
 func NewLetterAtScale(x float64, y float64, scale float64, speed float64, opacity services.Opacity, container services.ServiceContainer) Letter {
 	trails := make([]*trail, 0)
 	step := static.SpeedToMovement(1, speed) + float64(rand.Int31n(5))
-	var stampLimit = int(static.IconHeight / step)
-
+	var stampLimit = int(static.IconHeight/step) + static.IconSpacingInColumn
+	var trailDropLimit = int(rand.Int31n(static.MaxTrailLength) + static.MinTrailLength)
 	return &letter{
-		x, y, nil, trails, 0, scale, step, stampLimit, opacity, &ebiten.DrawImageOptions{}, container,
+		x, y, nil, trailDropLimit, trails, 0, scale, step, stampLimit, opacity, &ebiten.DrawImageOptions{}, container,
 	}
 }
 
@@ -78,7 +79,7 @@ func (l *letter) Draw(screen *ebiten.Image) {
 		l.trail = append([]*trail{{l.last, &ebiten.DrawImageOptions{}, l.x, l.y}}, l.trail...)
 		l.lastUsed = 1
 
-		for i := len(l.trail) - 1; i > static.MaxTrailLength-(int(l.opacity)/20); i-- {
+		for i := len(l.trail) - 1; i > l.trailDropLimit-(int(l.opacity)/20); i-- {
 			ref := l.trail[i].ref
 			ref.opacity = services.LowerOpacity(ref.opacity)
 			ref.image = l.container.ImageService().FindByName(ref.key, ref.opacity)
@@ -88,7 +89,7 @@ func (l *letter) Draw(screen *ebiten.Image) {
 		l.lastUsed = l.lastUsed + 1
 	}
 
-	if len(l.trail) == static.MaxTrailLength {
+	if len(l.trail) == l.trailDropLimit {
 		l.trail = l.trail[:len(l.trail)-1]
 	}
 }
