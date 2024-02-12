@@ -13,16 +13,17 @@ type Letter interface {
 }
 
 type letter struct {
-	x         float64
-	y         float64
-	last      *imageRef
-	trail     []*trail
-	lastUsed  int
-	scale     float64
-	speed     float64
-	opacity   services.Opacity
-	options   *ebiten.DrawImageOptions
-	container services.ServiceContainer
+	x             float64
+	y             float64
+	last          *imageRef
+	trail         []*trail
+	lastUsed      int
+	scale         float64
+	speed         float64
+	speedVariance int
+	opacity       services.Opacity
+	options       *ebiten.DrawImageOptions
+	container     services.ServiceContainer
 }
 
 type trail struct {
@@ -41,12 +42,12 @@ type imageRef struct {
 func NewLetterAtScale(x float64, y float64, scale float64, speed float64, opacity services.Opacity, container services.ServiceContainer) Letter {
 	trails := make([]*trail, 0)
 	return &letter{
-		x, y, nil, trails, 0, scale, speed, opacity, &ebiten.DrawImageOptions{}, container,
+		x, y, nil, trails, 0, scale, speed, int(rand.Int31n(5)), opacity, &ebiten.DrawImageOptions{}, container,
 	}
 }
 
 func (l *letter) Update() error {
-	change := static.SpeedToMovement(1, l.speed) * (1 + rand.Float64())
+	change := static.SpeedToMovement(1, l.speed) + float64(l.speedVariance)
 	hitBottom := l.y+change > static.ResolutionHeight
 
 	if hitBottom {

@@ -7,8 +7,7 @@ const (
 	ResolutionWidth            = ScreenWidth * 4
 	IconHeight                 = 100
 	IconWidth                  = 100
-	MaxTrailLength             = 25
-	MinTrailLength             = 7
+	MaxTrailLength             = 12
 	IconOverlap                = IconHeight / 5
 	LetterAssetFolder          = "assets/100x100/"
 	LetterAssetOpacity80Folder = LetterAssetFolder + "opacity/80/"
