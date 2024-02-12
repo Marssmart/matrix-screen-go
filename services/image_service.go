@@ -57,7 +57,6 @@ func NewImageService() ImageService {
 		cache[opacity60] = loadImage(opacity60)
 		cache[opacity40] = loadImage(opacity40)
 		cache[opacity20] = loadImage(opacity20)
-
 	}
 
 	return &imageService{imageCache: cache, leadLetterImageCache: leadLetterImageCache}

@@ -20,6 +20,7 @@ type letter struct {
 	lastUsed  int
 	scale     float64
 	speed     float64
+	opacity   services.Opacity
 	options   *ebiten.DrawImageOptions
 	container services.ServiceContainer
 }
@@ -37,10 +38,10 @@ type imageRef struct {
 	opacity services.Opacity
 }
 
-func NewLetterAtScale(x float64, y float64, scale float64, speed float64, container services.ServiceContainer) Letter {
+func NewLetterAtScale(x float64, y float64, scale float64, speed float64, opacity services.Opacity, container services.ServiceContainer) Letter {
 	trails := make([]*trail, 0)
 	return &letter{
-		x, y, nil, trails, 0, scale, speed, &ebiten.DrawImageOptions{}, container,
+		x, y, nil, trails, 0, scale, speed, opacity, &ebiten.DrawImageOptions{}, container,
 	}
 }
 
@@ -70,11 +71,11 @@ func (l *letter) Draw(screen *ebiten.Image) {
 	l.options = resetScaleAndTranslate(l.options, l.scale, l.x, l.y)
 	if l.lastUsed == 0 || l.lastUsed == 25 {
 		key, image := l.container.ImageService().DrawRandom(screen, l.options)
-		l.last = &imageRef{image, key, services.Opacity100}
+		l.last = &imageRef{image, key, l.opacity}
 		l.trail = append([]*trail{{l.last, &ebiten.DrawImageOptions{}, l.x, l.y}}, l.trail...)
 		l.lastUsed = 1
 
-		for i := len(l.trail) - 1; i > static.MaxTrailLength-5; i-- {
+		for i := len(l.trail) - 1; i > static.MaxTrailLength-(int(l.opacity)/20); i-- {
 			ref := l.trail[i].ref
 			ref.opacity = services.LowerOpacity(ref.opacity)
 			ref.image = l.container.ImageService().FindByName(ref.key, ref.opacity)

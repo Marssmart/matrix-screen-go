@@ -12,15 +12,15 @@ type Layer interface {
 	Draw(screen *ebiten.Image)
 }
 
-func NewLayer(x float64, y float64, scale float64, speed float64, container services.ServiceContainer) Layer {
+func NewLayer(x float64, y float64, scale float64, speed float64, opacity services.Opacity, container services.ServiceContainer) Layer {
 	letterCount := static.LetterCount(x, scale)
 	letters := make([]Letter, letterCount)
 	for i := 0; i < letterCount; i++ {
-		if rand.Int31n(5) == 1 {
+		if rand.Int31n(3) == 1 {
 			letters[i] = NewEmptySpace()
 		} else {
 			randomShiftY := rand.Int31n(static.ResolutionHeight / 3)
-			letters[i] = NewLetterAtScale(x+float64((static.IconWidth-static.IconOverlap)*i), y+float64(i)+float64(randomShiftY), scale, speed, container)
+			letters[i] = NewLetterAtScale(x+float64((static.IconWidth-static.IconOverlap)*i), y+float64(i)+float64(randomShiftY), scale, speed, opacity, container)
 		}
 	}
 	return &layer{x, y, letters, container}
