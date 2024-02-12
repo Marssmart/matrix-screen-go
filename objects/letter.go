@@ -71,7 +71,7 @@ func (l *letter) Draw(screen *ebiten.Image) {
 	//draw the lead
 	l.options = resetScaleAndTranslate(l.options, l.scale, l.x, l.y)
 	if l.lastUsed == 0 || l.lastUsed == 25 {
-		key, image := l.container.ImageService().DrawRandom(screen, l.options)
+		key, image := l.container.ImageService().DrawRandom(screen, l.options, l.opacity)
 		l.last = &imageRef{image, key, l.opacity}
 		l.trail = append([]*trail{{l.last, &ebiten.DrawImageOptions{}, l.x, l.y}}, l.trail...)
 		l.lastUsed = 1
