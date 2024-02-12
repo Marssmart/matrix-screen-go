@@ -2,6 +2,7 @@ package objects
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"math"
 	"math/rand"
 	"matrix-screen-go/services"
 	"matrix-screen-go/static"
@@ -43,7 +44,7 @@ type imageRef struct {
 func NewLetterAtScale(x float64, y float64, scale float64, speed float64, opacity services.Opacity, container services.ServiceContainer) Letter {
 	trails := make([]*trail, 0)
 	step := static.SpeedToMovement(1, speed) + float64(rand.Int31n(5))
-	var stampLimit = int(static.IconHeight/step) + static.IconSpacingInColumn
+	var stampLimit = int(static.IconHeight / math.Round(step)) //+ static.IconSpacingInColumn
 	var trailDropLimit = int(rand.Int31n(static.MaxTrailLength) + static.MinTrailLength)
 	return &letter{
 		x, y, nil, trailDropLimit, trails, 0, scale, step, stampLimit, opacity, &ebiten.DrawImageOptions{}, container,

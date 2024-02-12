@@ -1,8 +1,8 @@
 package static
 
 const (
-	ScreenHeight               = 768
-	ScreenWidth                = 1024
+	ScreenHeight               = 768 * 4
+	ScreenWidth                = 1024 * 4
 	ResolutionHeight           = ScreenHeight * 4
 	ResolutionWidth            = ScreenWidth * 4
 	IconHeight                 = 100
@@ -10,7 +10,6 @@ const (
 	MaxTrailLength             = 25
 	MinTrailLength             = 7
 	IconOverlapInRow           = IconWidth / 5
-	IconSpacingInColumn        = 2
 	LetterAssetFolder          = "assets/100x100/"
 	LetterAssetOpacity80Folder = LetterAssetFolder + "opacity/80/"
 	LetterAssetOpacity60Folder = LetterAssetFolder + "opacity/60/"
