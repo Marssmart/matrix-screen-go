@@ -13,16 +13,17 @@ type Letter interface {
 }
 
 type letter struct {
-	x         float64
-	y         float64
-	last      *imageRef
-	trail     []*trail
-	lastUsed  int
-	scale     float64
-	speed     float64
-	opacity   services.Opacity
-	options   *ebiten.DrawImageOptions
-	container services.ServiceContainer
+	x          float64
+	y          float64
+	last       *imageRef
+	trail      []*trail
+	lastUsed   int
+	scale      float64
+	step       float64
+	stampLimit int
+	opacity    services.Opacity
+	options    *ebiten.DrawImageOptions
+	container  services.ServiceContainer
 }
 
 type trail struct {
@@ -40,18 +41,21 @@ type imageRef struct {
 
 func NewLetterAtScale(x float64, y float64, scale float64, speed float64, opacity services.Opacity, container services.ServiceContainer) Letter {
 	trails := make([]*trail, 0)
+	step := static.SpeedToMovement(1, speed) + float64(rand.Int31n(5))
+	var stampLimit = int(static.IconHeight / step)
+
 	return &letter{
-		x, y, nil, trails, 0, scale, static.SpeedToMovement(1, speed) + float64(rand.Int31n(5)), opacity, &ebiten.DrawImageOptions{}, container,
+		x, y, nil, trails, 0, scale, step, stampLimit, opacity, &ebiten.DrawImageOptions{}, container,
 	}
 }
 
 func (l *letter) Update() error {
-	hitBottom := l.y+l.speed > static.ResolutionHeight
+	hitBottom := l.y+l.step > static.ResolutionHeight
 
 	if hitBottom {
 		l.y = 0
 	} else {
-		l.y = l.y + l.speed
+		l.y = l.y + l.step
 	}
 
 	return nil
@@ -68,7 +72,7 @@ func (l *letter) Draw(screen *ebiten.Image) {
 
 	//draw the lead
 	l.options = resetScaleAndTranslate(l.options, l.scale, l.x, l.y)
-	if l.lastUsed == 0 || l.lastUsed == 25 {
+	if l.lastUsed == 0 || l.lastUsed == l.stampLimit {
 		key, image := l.container.ImageService().DrawRandom(screen, l.options, l.opacity)
 		l.last = &imageRef{image, key, l.opacity}
 		l.trail = append([]*trail{{l.last, &ebiten.DrawImageOptions{}, l.x, l.y}}, l.trail...)
