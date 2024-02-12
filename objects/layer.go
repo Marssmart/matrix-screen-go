@@ -16,7 +16,7 @@ func NewLayer(x float64, y float64, scale float64, speed float64, opacity servic
 	letterCount := static.LetterCount(x, scale)
 	letters := make([]Letter, letterCount)
 	for i := 0; i < letterCount; i++ {
-		if rand.Int31n(3) == 1 {
+		if rand.Int31n(8) == 1 {
 			letters[i] = NewEmptySpace()
 		} else {
 			randomShiftY := rand.Int31n(static.ResolutionHeight / 3)
