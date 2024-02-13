@@ -14,40 +14,33 @@ type Letter interface {
 }
 
 type letter struct {
-	x              float64
-	y              float64
-	last           *imageRef
-	trailDropLimit int
-	trail          []*trail
-	lastUsed       int
-	scale          float64
-	step           float64
-	stampLimit     int
-	opacity        services.Opacity
-	options        *ebiten.DrawImageOptions
-	container      services.ServiceContainer
+	x, y, scale, step                    float64
+	last                                 *imageRef
+	trailDropLimit, lastUsed, stampLimit int
+	trail                                []*trail
+	options                              *ebiten.DrawImageOptions
+	container                            services.ServiceContainer
+	effects                              []Effect
 }
 
 type trail struct {
 	ref     *imageRef
 	options *ebiten.DrawImageOptions
-	x       float64
-	y       float64
+	x, y    float64
 }
 
 type imageRef struct {
-	image   *ebiten.Image
-	key     string
-	opacity services.Opacity
+	image *ebiten.Image
+	key   string
 }
 
-func NewLetterAtScale(x float64, y float64, scale float64, speed float64, opacity services.Opacity, container services.ServiceContainer) Letter {
+func NewLetterAtScale(x float64, y float64, scale float64, speed float64, container services.ServiceContainer) Letter {
 	trails := make([]*trail, 0)
 	step := static.SpeedToMovement(1, speed) + float64(rand.Int31n(5))
 	var stampLimit = int(static.IconHeight / math.Round(step)) //+ static.IconSpacingInColumn
 	var trailDropLimit = int(rand.Int31n(static.MaxTrailLength) + static.MinTrailLength)
 	return &letter{
-		x, y, nil, trailDropLimit, trails, 0, scale, step, stampLimit, opacity, &ebiten.DrawImageOptions{}, container,
+		x, y, scale, step, nil, trailDropLimit, 0, stampLimit, trails, &ebiten.DrawImageOptions{}, container, []Effect{NewPulsatingEffect()},
 	}
 }
 
@@ -67,23 +60,23 @@ func (l *letter) Draw(screen *ebiten.Image) {
 
 	//draw the trail
 	for _, memory := range l.trail {
-		memory.options = resetScaleAndTranslate(memory.options, l.scale, memory.x, memory.y)
+		resetScaleAndTranslate(memory.options, l.scale, memory.x, memory.y)
 		ref := memory.ref
-		l.container.ImageService().DrawWithOpacity(screen, ref.key, memory.options, ref.opacity)
+		memory.options.ColorScale.ScaleAlpha(0.995 - float32(len(l.trail))*0.0004)
+		l.container.ImageService().Draw(screen, ref.image, memory.options)
 	}
 
 	//draw the lead
-	l.options = resetScaleAndTranslate(l.options, l.scale, l.x, l.y)
+	resetScaleAndTranslate(l.options, l.scale, l.x, l.y)
 	if l.lastUsed == 0 || l.lastUsed == l.stampLimit {
-		key, image := l.container.ImageService().DrawRandom(screen, l.options, l.opacity)
-		l.last = &imageRef{image, key, l.opacity}
+		key, image := l.container.ImageService().DrawRandom(screen, l.options)
+		l.last = &imageRef{image, key}
 		l.trail = append([]*trail{{l.last, &ebiten.DrawImageOptions{}, l.x, l.y}}, l.trail...)
 		l.lastUsed = 1
 
-		for i := len(l.trail) - 1; i > l.trailDropLimit-(int(l.opacity)/20); i-- {
+		for i := len(l.trail) - 1; i > l.trailDropLimit; i-- {
 			ref := l.trail[i].ref
-			ref.opacity = services.LowerOpacity(ref.opacity)
-			ref.image = l.container.ImageService().FindByName(ref.key, ref.opacity)
+			ref.image = l.container.ImageService().FindByName(ref.key)
 		}
 	} else {
 		l.container.ImageService().Draw(screen, l.last.image, l.options)
@@ -95,11 +88,10 @@ func (l *letter) Draw(screen *ebiten.Image) {
 	}
 }
 
-func resetScaleAndTranslate(options *ebiten.DrawImageOptions, scale float64, x float64, y float64) *ebiten.DrawImageOptions {
+func resetScaleAndTranslate(options *ebiten.DrawImageOptions, scale float64, x float64, y float64) {
 	options.GeoM.Reset()
 	if scale != 1 {
 		options.GeoM.Scale(scale, scale)
 	}
 	options.GeoM.Translate(x, y)
-	return options
 }
