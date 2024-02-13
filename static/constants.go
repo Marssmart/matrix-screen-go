@@ -1,8 +1,8 @@
 package static
 
 const (
-	ScreenHeight               = 768 * 4
-	ScreenWidth                = 1024 * 4
+	ScreenHeight               = 768 * 2
+	ScreenWidth                = 1024 * 2
 	ResolutionHeight           = ScreenHeight * 4
 	ResolutionWidth            = ScreenWidth * 4
 	IconHeight                 = 100
